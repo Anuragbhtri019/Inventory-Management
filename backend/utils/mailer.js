@@ -1,16 +1,4 @@
-/**
- * Email utilities.
- *
- * Same in most projects (boilerplate): Nodemailer transporter from env vars + helper to send templated emails.
- * Project-specific: email subject/body branding and which messages are sent (OTP verification/reset).
- */
-
 const nodemailer = require("nodemailer");
-
-/**
- * Creates a Nodemailer transporter from environment variables.
- * Supports Gmail SMTP by default but allows overriding host/port.
- */
 const createTransporter = () => {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || 465);
@@ -24,7 +12,6 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host,
     port,
-    // Port 465 uses implicit TLS; other ports typically use STARTTLS.
     secure: port === 465,
     auth: {
       user,
@@ -32,13 +19,6 @@ const createTransporter = () => {
     },
   });
 };
-
-/**
- * Sends an OTP email.
- *
- * Note: the email template name mentions "TrendMart"; you may want to rename
- * it later for branding consistency. Logic-wise it is purely content.
- */
 const sendOtpEmail = async ({ to, otp }) => {
   const transporter = createTransporter();
   const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER;

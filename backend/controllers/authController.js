@@ -1,10 +1,3 @@
-/**
- * Auth controller.
- *
- * Same in most projects (boilerplate): register/login flows, JWT issuance, validation, OTP/reset patterns.
- * Project-specific: User/UserSession schema fields (isAdmin, isEmailVerified, otpHash/resetOtpHash) and the exact API responses/messages.
- */
-
 const User = require("../models/User");
 const UserSession = require("../models/UserSession");
 const jwt = require("jsonwebtoken");
@@ -62,6 +55,8 @@ const resetPasswordSchema = Joi.object({
 /**
  * Generates a signed JWT used by the frontend for authenticated requests.
  * `sessionId` is included so we can update session activity and support admin session views.
+/**
+ * Auth controller.
  */
 const generateToken = (id, sessionId) =>
   jwt.sign({ id, sessionId }, process.env.JWT_SECRET, { expiresIn: "30d" });

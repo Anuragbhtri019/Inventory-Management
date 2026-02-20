@@ -1,10 +1,3 @@
-/**
- * User controller.
- *
- * Same in most projects (boilerplate): profile endpoints, password change, admin user listing/updating.
- * Project-specific: OTP re-verification when email changes, avatar data-URL size checking, and roles/admin rules.
- */
-
 const User = require("../models/User");
 const UserSession = require("../models/UserSession");
 const CustomError = require("../utils/CustomError");
@@ -13,7 +6,6 @@ const Joi = require("joi");
 const { generateOtp, hashOtp } = require("../utils/otp");
 const { sendOtpEmail } = require("../utils/mailer");
 
-// Convert a Mongoose document to a "safe" JSON object.
 // Removes sensitive fields that should never be returned to the client.
 const toSafeUser = (user) => {
   const data = user.toObject();
@@ -25,23 +17,17 @@ const toSafeUser = (user) => {
   return data;
 };
 
-/**
- * GET /api/users/me
- * Returns the authenticated user injected by auth middleware.
- */
 const getProfile = (req, res) => {
   res.json({ success: true, data: req.user });
 };
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
-// Helper checks for base64 image data URL.
 const isImageDataUrl = (value) =>
   typeof value === "string" &&
   value.startsWith("data:image/") &&
   value.includes(";base64,");
 
-// Roughly estimate decoded bytes for a base64 data URL without fully decoding it.
 const estimateDataUrlBytes = (dataUrl) => {
   if (!isImageDataUrl(dataUrl)) return 0;
   const base64 = String(dataUrl.split(",")[1] || "");
@@ -66,14 +52,6 @@ const updateMeSchema = Joi.object({
   avatarUrl: avatarSchema,
 });
 
-/**
- * PUT /api/users/me
- * Updates current user profile fields.
- *
- * Side effects:
- * - If email changes, user becomes unverified and a new OTP is sent.
- * - Avatar data URLs are size-checked (2MB) to prevent huge payload storage.
- */
 const updateMe = async (req, res, next) => {
   const { error } = updateMeSchema.validate(req.body);
   if (error) return next(new CustomError(error.details[0].message, 400));
@@ -86,7 +64,6 @@ const updateMe = async (req, res, next) => {
     const emailChanged =
       typeof nextEmail === "string" && nextEmail && nextEmail !== user.email;
 
-    // Changing email triggers a new verification workflow.
     if (emailChanged) {
       const existing = await User.findOne({ email: nextEmail });
       if (existing) {
@@ -102,7 +79,6 @@ const updateMe = async (req, res, next) => {
 
     if (typeof req.body.name === "string") user.name = req.body.name;
     if (typeof req.body.phone === "string") user.phone = req.body.phone;
-    // Allow either hosted URLs or data URLs for avatars.
     if (typeof req.body.avatarUrl === "string") {
       if (isImageDataUrl(req.body.avatarUrl)) {
         const bytes = estimateDataUrlBytes(req.body.avatarUrl);
@@ -135,11 +111,6 @@ const changePasswordSchema = Joi.object({
   newPassword: Joi.string().min(6).required(),
   confirmPassword: Joi.string().min(6).required(),
 });
-
-/**
- * PATCH /api/users/me/password
- * Checks old password and sets a new one.
- */
 const changeMyPassword = async (req, res, next) => {
   const { error } = changePasswordSchema.validate(req.body);
   if (error) return next(new CustomError(error.details[0].message, 400));
@@ -157,7 +128,6 @@ const changeMyPassword = async (req, res, next) => {
       return next(new CustomError("Old password is incorrect", 400));
     }
 
-    // Model pre-save hook re-hashes password.
     user.password = newPassword;
     await user.save();
 
@@ -174,11 +144,6 @@ const adminUpdateUserSchema = Joi.object({
   avatarUrl: avatarSchema,
   isEmailVerified: Joi.boolean().optional(),
 });
-
-/**
- * PATCH /api/users/:id
- * Admin-only: updates another user's profile.
- */
 const adminUpdateUser = async (req, res, next) => {
   const { error } = adminUpdateUserSchema.validate(req.body);
   if (error) return next(new CustomError(error.details[0].message, 400));
@@ -222,10 +187,6 @@ const adminUpdateUser = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/users
- * Admin-only: returns all users (sensitive fields excluded).
- */
 const listUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select(
@@ -237,10 +198,6 @@ const listUsers = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/users/:id
- * Admin-only: fetch a single user.
- */
 const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select(
@@ -253,10 +210,6 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-/**
- * PATCH /api/users/:id/role
- * Admin-only: set user's role to one of the allowed roles.
- */
 const updateUserRole = async (req, res, next) => {
   const { role } = req.body;
   if (!role || !isRoleAllowed(role)) {
@@ -276,10 +229,6 @@ const updateUserRole = async (req, res, next) => {
   }
 };
 
-/**
- * PATCH /api/users/:id/verify
- * Admin-only: mark a user as verified and clear OTP fields.
- */
 const verifyUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -296,11 +245,6 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /api/users/:id
- * Admin-only.
- * Prevents admins from deleting other admins (self-delete is allowed if needed).
- */
 const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -310,7 +254,6 @@ const deleteUser = async (req, res, next) => {
       return next(new CustomError("Admins cannot delete other admins", 403));
     }
 
-    // Clean up sessions for the deleted account.
     await UserSession.deleteMany({ user: user._id });
     await user.deleteOne();
 
@@ -320,10 +263,6 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/users/:id/sessions
- * Admin-only: returns recent sessions for a user.
- */
 const getUserSessions = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);

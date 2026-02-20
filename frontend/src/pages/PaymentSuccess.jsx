@@ -19,7 +19,6 @@ const toDisplayMessage = (value) => {
     if (typeof maybeMsg === "string") return maybeMsg;
     const maybeStatus = value.status;
     if (typeof maybeStatus === "string") return maybeStatus;
-    // Avoid showing raw JSON blobs to users.
     return "";
   }
   return String(value);
@@ -42,9 +41,6 @@ const computePaymentReference = (searchKey) => {
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // React Router may provide a new URLSearchParams instance across renders.
-  // Using a stable string key prevents effects from re-running just because
-  // the object identity changed.
   const searchKey = searchParams.toString();
   const { addActivity } = useNotifications();
   const [status, setStatus] = useState("verifying");
@@ -183,8 +179,6 @@ const PaymentSuccess = () => {
             toastId: `payment_pending:${pidx}`,
           });
         } else {
-          // If the user reached our return page and the payment is not Completed/Pending,
-          // persist it so it shows under Cancelled/Failed history (Khalti lookup may still say Initiated).
           try {
             await api.post("/payment/cancel", {
               pidx,
@@ -415,12 +409,10 @@ const PaymentSuccess = () => {
               {config.title}
             </h1>
 
-            {/* Details */}
             <p className="text-base text-slate-700 dark:text-mid-300 mb-8 leading-relaxed max-w-md mx-auto">
               {effectiveMessage}
             </p>
 
-            {/* Payment Reference */}
             <div className="bg-slate-50/80 dark:bg-deep-900/35 rounded-lg p-4 mb-8 border border-slate-200/70 dark:border-deep-700/70">
               <p className="text-xs text-slate-600 dark:text-mid-400 font-medium mb-2">
                 PAYMENT REFERENCE

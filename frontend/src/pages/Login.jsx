@@ -20,8 +20,7 @@ const Login = () => {
 
     try {
       await login(email, password, rememberMe);
-      toast.success("Welcome back , Login Successful!"); // Success message on login
-      // navigate happens inside AuthContext
+      toast.success("Welcome back , Login Successful!");
     } catch (err) {
       const errorMsg =
         err.message || "Failed to login. Please check your credentials.";

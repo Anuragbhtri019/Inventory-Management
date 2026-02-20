@@ -25,8 +25,6 @@ const History = () => {
       const { data } = await api.get("/payment/mine");
       setPayments(data.data || []);
 
-      // If Khalti doesn't redirect back to /payment-success on cancel,
-      // we can still reconcile the most recent initiated payment here.
       if (!reconcileOnceRef.current) {
         reconcileOnceRef.current = true;
         const pidx = sessionStorage.getItem("lastPaymentPidx") || "";
@@ -38,7 +36,6 @@ const History = () => {
               .trim()
               .toLowerCase();
 
-            // If it isn't completed/pending, treat it as cancelled/failed and persist.
             if (s && s !== "completed" && s !== "pending") {
               try {
                 await api.post("/payment/cancel", {
@@ -46,7 +43,6 @@ const History = () => {
                   reason: `history_reconcile:${s}`,
                 });
               } catch {
-                // best-effort
               }
               sessionStorage.removeItem("lastPaymentPidx");
               sessionStorage.removeItem("lastPaymentStartedAt");
@@ -55,11 +51,9 @@ const History = () => {
               sessionStorage.removeItem("lastPaymentStartedAt");
             }
 
-            // Refresh list after reconciliation attempt.
             const refreshed = await api.get("/payment/mine");
             setPayments(refreshed.data?.data || []);
           } catch {
-            // Ignore reconciliation errors; history will still show what we have.
           }
         }
       }

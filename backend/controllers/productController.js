@@ -1,10 +1,3 @@
-/**
- * Product controller.
- *
- * Same in most projects (boilerplate): CRUD handlers with Joi validation + Mongo queries + consistent error responses.
- * Project-specific: product fields (images/isFavourite), and the admin/ownership authorization rules used by this app.
- */
-
 const Product = require("../models/Product");
 const Joi = require("joi");
 const CustomError = require("../utils/CustomError");
@@ -31,6 +24,8 @@ const productSchema = Joi.object({
  * POST /api/products
  * Admin-only (enforced in routes).
  * Validates product payload and creates a new Product owned by the current user.
+/**
+ * Product controller.
  */
 const createProduct = async (req, res, next) => {
   const { error } = productSchema.validate(req.body);

@@ -1,10 +1,3 @@
-/**
- * Payment controller.
- *
- * Same in most projects (boilerplate): initiate/verify/cancel payment flows, listing history, receipt generation.
- * Project-specific: Khalti API integration, stock-decrement transaction in confirmPurchase, and the Payment/Product schema fields used.
- */
-
 const axios = require("axios");
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");

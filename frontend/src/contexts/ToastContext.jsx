@@ -1,17 +1,7 @@
 import React, { createContext, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
-
-/**
- * ToastContext
- *
- * Small wrapper around react-toastify so components can show toast messages
- * without importing `toast` directly.
- */
 export const ToastContext = createContext();
 
-/**
- * Custom hook to consume ToastContext.
- */
 export const useToast = () => {
   const context = React.useContext(ToastContext);
   if (!context) {
@@ -21,7 +11,6 @@ export const useToast = () => {
 };
 
 export const ToastProvider = ({ children }) => {
-  // Wrap toast calls in stable callbacks to avoid re-renders.
   const showSuccess = useCallback((message) => {
     toast.success(message, {
       position: "top-right",

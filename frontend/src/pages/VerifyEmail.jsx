@@ -52,7 +52,6 @@ const VerifyEmail = () => {
     try {
       sessionStorage.setItem(issuedKey, String(ts));
     } catch {
-      // ignore
     }
     return ts;
   }, [issuedKey]);
@@ -62,7 +61,6 @@ const VerifyEmail = () => {
       const raw = Number(sessionStorage.getItem(issuedKey));
       if (Number.isFinite(raw) && raw > 0) return raw;
     } catch {
-      // ignore
     }
     return 0;
   }, [issuedKey]);
@@ -91,7 +89,6 @@ const VerifyEmail = () => {
         intervalRef.current = null;
       }
     };
-    // issuedKey changes when email changes
   }, [email, issuedKey, getIssuedAt, setIssuedNow]);
 
   const handleVerify = async (e) => {
@@ -112,7 +109,6 @@ const VerifyEmail = () => {
     try {
       await verifyOtp(email, otp);
       toast.success("Email verified. Welcome!");
-      // navigation happens inside AuthContext
     } catch (err) {
       toast.error(err.message || "OTP verification failed");
     } finally {

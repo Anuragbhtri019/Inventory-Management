@@ -6,22 +6,10 @@ import {
   useMemo,
   useState,
 } from "react";
-
-/**
- * CartContext
- *
- * Stores a small shopping-cart-like list of items:
- *   { productId: string, quantity: number }
- *
- * Persistence:
- * - Uses localStorage so cart survives tab closes and refreshes.
- * - Keeps data normalized (positive integer quantities, valid productId).
- */
 const CartContext = createContext();
 
 const STORAGE_KEY = "cart";
 
-// Read and sanitize cart from localStorage.
 const readStoredCart = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -40,17 +28,12 @@ const readStoredCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  // Initialize from storage once.
   const [items, setItems] = useState(readStoredCart);
 
-  // Persist on any change.
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  /**
-   * Adds quantity to an item. If item doesn't exist, it is created.
-   */
   const addItem = useCallback((productId, quantity = 1) => {
     const qty = Math.max(Math.floor(Number(quantity) || 1), 1);
     setItems((prev) => {
@@ -62,9 +45,6 @@ export const CartProvider = ({ children }) => {
     });
   }, []);
 
-  /**
-   * Sets quantity to an exact value (minimum 1).
-   */
   const setItemQuantity = useCallback((productId, quantity) => {
     const qty = Math.max(Math.floor(Number(quantity) || 1), 1);
     setItems((prev) =>
@@ -74,19 +54,12 @@ export const CartProvider = ({ children }) => {
     );
   }, []);
 
-  /**
-   * Removes an item completely.
-   */
   const removeItem = useCallback((productId) => {
     setItems((prev) => prev.filter((i) => i.productId !== productId));
   }, []);
 
-  /**
-   * Clears the entire cart.
-   */
   const clear = useCallback(() => setItems([]), []);
 
-  // Derived state used by the navbar badge.
   const totalItems = useMemo(
     () => items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0),
     [items],

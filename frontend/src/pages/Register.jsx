@@ -64,7 +64,6 @@ const Register = () => {
           String(Date.now()),
         );
       } catch {
-        // ignore
       }
 
       navigate(`/verify-email?email=${encodeURIComponent(registered)}`);

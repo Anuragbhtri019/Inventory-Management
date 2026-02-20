@@ -4,14 +4,6 @@ const { allowedRoles } = require("../config/roles");
 
 /**
  * User model.
- *
- * Same in most projects (boilerplate): user schema + password hashing + matchPassword helper.
- * Project-specific: role/isAdmin syncing, OTP/reset fields, and the exact allowed roles list.
- *
- * Notes:
- * - `role` and `isAdmin` are kept in sync via a pre-save hook.
- * - Passwords are hashed automatically when the `password` field changes.
- * - OTP fields store hashes only (never store raw OTP codes).
  */
 const userSchema = new mongoose.Schema({
   name: {
@@ -77,7 +69,6 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function () {
-  // Keep role and isAdmin mutually consistent.
   if (this.isModified("role")) {
     this.isAdmin = this.role === "admin";
   }
@@ -86,12 +77,10 @@ userSchema.pre("save", async function () {
     this.role = this.isAdmin ? "admin" : "user";
   }
 
-  // 'this' must be the document → arrow function would break 'this'
   if (!this.isModified("password")) {
     return;
   }
 
-  // More explicit salt + hash (safer and clearer)
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 });
