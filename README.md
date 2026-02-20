@@ -191,7 +191,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=gmail_account_for_otp
 SMTP_PASS=your_app_password
-SMTP_FROM=INVENTORY MANAGER <gmail_account_for_otp>
+SMTP_FROM=INVENTORY MANAGEMENT <gmail_account_for_otp>
 ```
 
 Run the API:
