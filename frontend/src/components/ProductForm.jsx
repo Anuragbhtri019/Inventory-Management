@@ -30,7 +30,6 @@ const ProductForm = ({
   const [imageErrors, setImageErrors] = useState(["", "", "", ""]);
   const [isImagesOpen, setIsImagesOpen] = useState(false);
 
-  // Sync form when initialData changes (for edit mode)
   useEffect(() => {
     setName(initialData.name || "");
     setQuantity(initialData.quantity || "");
@@ -112,7 +111,6 @@ const ProductForm = ({
         description,
         images: images.map((u) => String(u || "").trim()).filter(Boolean),
       });
-      // Reset form on successful submit if adding new product
       if (!initialData._id) {
         setName("");
         setQuantity("");

@@ -125,7 +125,6 @@ const PaymentSuccess = () => {
 
     const verifyPayment = async () => {
       try {
-        // Reset UI state for this verification run.
         setStatus("verifying");
         setMessage("Checking payment status...");
         setIcon("⏳");
@@ -136,9 +135,7 @@ const PaymentSuccess = () => {
               pidx,
               reason: statusParam,
             });
-          } catch {
-            // Best-effort: even if this fails, verification may still update status.
-          }
+          } catch {}
         }
 
         const response = await api.post("/payment/verify", { pidx });
@@ -162,7 +159,6 @@ const PaymentSuccess = () => {
           setStatus("success");
           setMessage("Payment confirmed successfully!");
           setIcon("✅");
-          // toastId makes this idempotent even if this effect re-runs.
           toast.success("Payment verified!", {
             toastId: `payment_verified:${pidx}`,
           });
@@ -186,9 +182,7 @@ const PaymentSuccess = () => {
                 ? statusParam
                 : `not_completed:${String(paymentStatus || "unknown")}`,
             });
-          } catch {
-            // Best-effort only
-          }
+          } catch {}
 
           sessionStorage.removeItem("lastPaymentPidx");
           sessionStorage.removeItem("lastPaymentStartedAt");
@@ -226,7 +220,6 @@ const PaymentSuccess = () => {
           scheduleRedirectHome(2500);
         }
       } catch (err) {
-        // If verify fails, still persist the attempt so it shows up in Cancelled history.
         try {
           await api.post("/payment/cancel", {
             pidx,
@@ -234,9 +227,7 @@ const PaymentSuccess = () => {
               ? statusParam
               : "verify_failed_or_inaccessible",
           });
-        } catch {
-          // best-effort
-        }
+        } catch {}
         sessionStorage.removeItem("lastPaymentPidx");
         sessionStorage.removeItem("lastPaymentStartedAt");
         setStatus("failed");
