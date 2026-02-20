@@ -1,0 +1,199 @@
+@config "../tailwind.config.js";
+@import "tailwindcss";
+
+/* Optional: basic reset / global styles */
+/* ────────────────────────────────────────────────
+   Modern Base + Glassmorphism (Dark/Light Modes)
+   Palette: #30364F (deep), #ACBAC4 (gray), #E1D9BC (cream)
+   60-30-10 applied via variables
+──────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    /* ── Core palette ── */
+    --color-deep: #30364f;
+    --color-mid: #acbac4;
+    --color-accent: #e1d9bc;
+
+    /* ── Light mode (default) ── */
+    --bg-primary: #f8fafc;
+    --bg-secondary: rgba(48, 54, 79, 0.06);
+    --text-primary: #0b1220;
+    --text-secondary: #465266;
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(48, 54, 79, 0.14);
+    --glass-shadow: 0 12px 40px rgba(48, 54, 79, 0.12);
+    --blur: blur(16px);
+    --radius: 1.25rem;
+
+    color-scheme: light;
+  }
+
+  /* Dark mode override (ThemeToggle adds .dark to <html>) */
+  html.dark {
+    --bg-primary: #0b1220;
+    --bg-secondary: rgba(172, 186, 196, 0.12);
+    --text-primary: var(--color-accent);
+    --text-secondary: var(--color-mid);
+    --glass-bg: rgba(26, 31, 46, 0.55);
+    --glass-border: rgba(225, 217, 188, 0.18);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    --blur: blur(12px);
+    color-scheme: dark;
+  }
+
+  /* ── Global reset & typography ── */
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.65;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: inherit;
+  }
+
+  p {
+    max-width: 75ch;
+  }
+
+  /* ── Glassmorphism utility class ── */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+  }
+
+  .glass:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18); /* deeper on hover */
+  }
+
+  /* Form elements are styled via Tailwind components (Input/Button). */
+
+  /* Hide browser-injected password reveal icons (Edge/IE) so our custom toggle
+     doesn't show up twice. */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
+
+  /* ── Scrollbar (subtle, theme-aware) ── */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+
+  /* ── Selection ── */
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 35%, var(--bg-primary));
+    color: var(--bg-primary);
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade {
+    animation: fadeIn 0.6s ease-out;
+  }
+  .animate-slide {
+    animation: slideUp 0.7s ease-out;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Optional subtle background overlay for depth (theme-aware) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -2;
+    background:
+      radial-gradient(
+        circle at 15% 15%,
+        rgba(48, 54, 79, 0.1),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 85% 85%,
+        rgba(172, 186, 196, 0.08),
+        transparent 55%
+      );
+  }
+
+  html.dark body::before {
+    background:
+      radial-gradient(
+        circle at 15% 15%,
+        rgba(79, 176, 167, 0.1),
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 85% 85%,
+        rgba(247, 178, 74, 0.06),
+        transparent 60%
+      );
+  }
+}

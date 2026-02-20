@@ -1,0 +1,62 @@
+/**
+ * Email utilities.
+ *
+ * Same in most projects (boilerplate): Nodemailer transporter from env vars + helper to send templated emails.
+ * Project-specific: email subject/body branding and which messages are sent (OTP verification/reset).
+ */
+
+const nodemailer = require("nodemailer");
+
+/**
+ * Creates a Nodemailer transporter from environment variables.
+ * Supports Gmail SMTP by default but allows overriding host/port.
+ */
+const createTransporter = () => {
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT || 465);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!user || !pass) {
+    throw new Error("SMTP_USER and SMTP_PASS must be set in the environment");
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    // Port 465 uses implicit TLS; other ports typically use STARTTLS.
+    secure: port === 465,
+    auth: {
+      user,
+      pass,
+    },
+  });
+};
+
+/**
+ * Sends an OTP email.
+ *
+ * Note: the email template name mentions "TrendMart"; you may want to rename
+ * it later for branding consistency. Logic-wise it is purely content.
+ */
+const sendOtpEmail = async ({ to, otp }) => {
+  const transporter = createTransporter();
+  const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER;
+
+  return transporter.sendMail({
+    from: fromAddress,
+    to,
+    subject: "Your TrendMart verification code",
+    text: `Your TrendMart verification code is ${otp}. It expires in 2 minutes.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #0b1220;">
+        <h2 style="margin: 0 0 12px;">TrendMart verification</h2>
+        <p>Use the code below to verify your email address. This code expires in 2 minutes.</p>
+        <div style="font-size: 24px; font-weight: 700; letter-spacing: 6px; margin: 16px 0;">${otp}</div>
+        <p>If you did not request this, you can ignore this email.</p>
+      </div>
+    `,
+  });
+};
+
+module.exports = { sendOtpEmail };
