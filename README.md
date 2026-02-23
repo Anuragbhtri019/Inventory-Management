@@ -15,7 +15,7 @@ This repository is a **monorepo** with two apps:
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [Scripts](#scripts)
-- [API & Postman](#api--postman)
+- [API](#api)
 - [What You Can Learn](#what-you-can-learn)
 - [How This Project Was Created (High Level)](#how-this-project-was-created-high-level)
 
@@ -27,7 +27,7 @@ This repository is a **monorepo** with two apps:
 - Product CRUD
 - Payment endpoints (Khalti sandbox)
 - Centralized error handling
-- Postman collection included for API testing
+- API routes summarized in this README
 
 ## Tech Stack
 
@@ -60,7 +60,7 @@ Inventory-Management/
   backend/                         # Express API
     package.json
     server.js                      # App entry
-    .env.example                   # Example environment variables
+    .env                           # Create locally (not committed)
     config/
       db.js                        # MongoDB connection
       roles.js                     # Role constants/logic
@@ -149,7 +149,7 @@ Inventory-Management/
 
 - Node.js 18+ (recommended)
 - MongoDB (local or MongoDB Atlas)
-- (Optional) Postman
+- (Optional) API client (e.g., curl or Insomnia)
 
 ### Clone
 
@@ -240,7 +240,7 @@ Email (OTP):
 
 Notes:
 
-- The backend also supports alternative Khalti live key variable names (see `backend/.env.example`).
+- The backend also supports alternative Khalti live key variable names
 - Gmail SMTP: you typically need a Google **App Password** (not your normal password).
 
 ## Scripts
@@ -285,7 +285,6 @@ Key routes (high level):
 - Integrating a payment gateway (Khalti sandbox) end-to-end
 - React app architecture: routing, contexts (auth/cart/theme/notifications)
 - Tailwind CSS workflow in a Vite + React project
-- API testing using Postman collections
 
 ## How This Project Was Created (High Level)
 
@@ -298,4 +297,4 @@ If you want to build a similar project (not detailed), the typical steps are:
 5. Scaffold frontend with Vite + React, add React Router and Tailwind
 6. Build UI pages, centralize API calls (Axios), store state with React Context
 7. Add payment UI + integrate payment endpoints
-8. Document the API and ship a Postman collection for verification
+8. Document the API (README or API docs)
